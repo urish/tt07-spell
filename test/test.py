@@ -157,7 +157,7 @@ async def test_loop(dut):
 # Note: this test takes relatively long time to run, so you may want to skip it
 @cocotb.test()
 async def test_delay(dut):
-    delay_ms_cycles = 10000 # Hardcoded value for now
+    delay_ms_cycles = 10000  # Hardcoded value for now
 
     spell = SpellController(dut)
     clock = Clock(dut.clk, 10, units="us")
@@ -233,7 +233,22 @@ async def test_code_mem_write(dut):
 
     assert await spell.read_pc() == 5
     assert await spell.read_sp() == 1
-    assert await spell.read_stack_top() == 5  # TODO WTF?
+    assert await spell.read_stack_top() == 5
+
+
+@cocotb.test()
+async def test_code_mem_init_0xff(dut):
+    spell = SpellController(dut)
+    clock = Clock(dut.clk, 10, units="us")
+    cocotb.start_soon(clock.start())
+    await reset(dut)
+
+    await spell.push(0)
+    await spell.exec_opcode("?")
+    
+    assert await spell.read_sp() == 1
+    # 0xff is the default value of the code memory:
+    assert await spell.read_stack_top() == 0xFF
 
 
 @cocotb.test()

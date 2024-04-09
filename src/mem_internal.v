@@ -52,14 +52,15 @@ module spell_mem_internal (
           if (memory_type_data && addr < data_size) begin
             data_mem[data_addr] <= data_in;
           end else if (!memory_type_data && addr < code_size) begin
-            code_mem[code_addr] <= data_in;
+            // Code memory is inverted, to make uninitialized memory appear as 0xff
+            code_mem[code_addr] <= ~data_in;
           end
         end else begin
           data_out <= memory_type_data ? 8'h00 : 8'hff;
           if (memory_type_data && addr < data_size) begin
             data_out <= data_mem[data_addr];
           end else if (!memory_type_data && addr < code_size) begin
-            data_out <= code_mem[code_addr];
+            data_out <= ~code_mem[code_addr];
           end
         end
       end
