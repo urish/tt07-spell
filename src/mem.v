@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 `default_nettype none
-//
-`timescale 1ns / 1ps
 
 module spell_mem (
     input wire rst_n,

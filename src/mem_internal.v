@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 `default_nettype none
-//
-`timescale 1ns / 1ps
 
 module spell_mem_internal (
     input wire rst_n,
@@ -20,8 +18,14 @@ module spell_mem_internal (
   localparam code_size = 32;
   localparam data_size = 8;
 
+  localparam code_bits = $clog2(code_size);
+  localparam data_bits = $clog2(data_size);
+
   reg [7:0] code_mem[code_size-1:0];
   reg [7:0] data_mem[data_size-1:0];
+
+  wire [code_bits-1:0] code_addr = addr[code_bits-1:0];
+  wire [data_bits-1:0] data_addr = addr[data_bits-1:0];
 
   reg [1:0] cycles;
 
@@ -31,8 +35,8 @@ module spell_mem_internal (
     if (~rst_n) begin
       cycles <= 0;
       data_ready <= 0;
-      for (i = 0; i < code_size; i++) code_mem[i] = 0;
-      for (i = 0; i < data_size; i++) data_mem[i] = 0;
+      for (i = 0; i < code_size; i++) code_mem[i] <= 8'h00;
+      for (i = 0; i < data_size; i++) data_mem[i] <= 8'h00;
     end else begin
       if (!select) begin
         data_out   <= 8'bx;
@@ -46,16 +50,16 @@ module spell_mem_internal (
         data_ready <= 1'b1;
         if (write) begin
           if (memory_type_data && addr < data_size) begin
-            data_mem[addr] <= data_in;
+            data_mem[data_addr] <= data_in;
           end else if (!memory_type_data && addr < code_size) begin
-            code_mem[addr] <= data_in;
+            code_mem[code_addr] <= data_in;
           end
         end else begin
-          data_out <= 8'b0;
+          data_out <= memory_type_data ? 8'h00 : 8'hff;
           if (memory_type_data && addr < data_size) begin
-            data_out <= data_mem[addr];
+            data_out <= data_mem[data_addr];
           end else if (!memory_type_data && addr < code_size) begin
-            data_out <= code_mem[addr];
+            data_out <= code_mem[code_addr];
           end
         end
       end

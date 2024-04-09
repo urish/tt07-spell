@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 `default_nettype none
-//
-`timescale 1ns / 1ps
 
 module tt_um_urish_spell (
     input  wire [7:0] ui_in,    // Dedicated inputs
@@ -91,25 +89,35 @@ module tt_um_urish_spell (
   reg [63:0] reg_name;
   reg [63:0] state_name;
 
+  // To avoid linter warnings about unused wires
+  wire _unused_ok = &{
+    1'b0,
+    ena,
+    ui_in[7],
+    state_name,
+    reg_name,
+    1'b0
+  };
+
   always @(*) begin
     case (state)
-      StateFetch: state_name <= "Fetch";
-      StateFetchData: state_name <= "FetchDat";
-      StateExecute: state_name <= "Execute";
-      StateStore: state_name <= "Store";
-      StateDelay: state_name <= "Delay";
-      StateSleep: state_name <= "Sleep";
-      StateStop: state_name <= "Stop";
-      default: state_name <= "Invalid";
+      StateFetch: state_name = "Fetch";
+      StateFetchData: state_name = "FetchDat";
+      StateExecute: state_name = "Execute";
+      StateStore: state_name = "Store";
+      StateDelay: state_name = "Delay";
+      StateSleep: state_name = "Sleep";
+      StateStop: state_name = "Stop";
+      default: state_name = "Invalid";
     endcase
   end
 
   always @(*) begin
     case (i_reg_sel)
-      REG_PC: reg_name <= "PC";
-      REG_SP: reg_name <= "SP";
-      REG_EXEC: reg_name <= "Exec";
-      REG_STACK_TOP: reg_name <= "StackTop";
+      REG_PC: reg_name = "PC";
+      REG_SP: reg_name = "SP";
+      REG_EXEC: reg_name = "Exec";
+      REG_STACK_TOP: reg_name = "StackTop";
     endcase
   end
 
@@ -163,7 +171,7 @@ module tt_um_urish_spell (
       state <= StateSleep;
       pc    <= 0;
       sp    <= 0;
-      for (j = 0; j < 32; j++) stack[j] = 0;
+      for (j = 0; j < 32; j++) stack[j] <= 0;
       opcode <= 0;
       mem_select <= 0;
       mem_write_en <= 0;
@@ -244,10 +252,10 @@ module tt_um_urish_spell (
           mem_addr <= memory_write_addr;
           mem_write_value <= memory_write_data;
           if (stack_write_count == 1 || stack_write_count == 2) begin
-            stack[next_sp-1] = set_stack_top;
+            stack[next_sp-1] <= set_stack_top;
           end
           if (stack_write_count == 2) begin
-            stack[next_sp-2] = set_stack_belowtop;
+            stack[next_sp-2] <= set_stack_belowtop;
           end
           if (memory_write_en) begin
             state <= StateStore;
