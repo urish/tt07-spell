@@ -5,7 +5,7 @@ project:
   discord:      "urish"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "SPELL is a minimal, cryptic, stack-based programming language crafted for The Skull CTF"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+  clock_hz:     10000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
   tiles: "2x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
@@ -30,7 +30,7 @@ pinout:
   ui[3]: "dump"
   ui[4]: "shift_in"
   ui[5]: "reg_sel[0]"
-  ui[6]: "segl_sel[1]"
+  ui[6]: "reg_sel[1]"
   ui[7]: ""
 
   # Outputs
