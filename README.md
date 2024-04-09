@@ -1,6 +1,8 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# SPELL
+
+> SPELL is a minimal, stack-based programming language created for The Skull CTF
 
 - [Read the documentation for project](docs/info.md)
 

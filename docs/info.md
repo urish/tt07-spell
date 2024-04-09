@@ -82,8 +82,22 @@ The `STACK` register is used to push a value onto the stack or read the top valu
 
 ## How to test
 
-TODO
+To test SPELL, you need to load a program into the program memory and execute it. You can load the program by repeatedly executing the following steps for each byte of the program:
+
+1. Write the byte to the top of the stack (using the `STACK` register)
+2. Write the address of the byte in the program memory to top of the stack
+3. Write the opcode `!` to the `EXEC` register
+
+After loading the program, you can execute it by writing the address of the first byte in the program memory to the `PC` register, and then pulsing the `run` signal.
+
+### Test program
+
+The following program which will rapidly blink an LED connected to the `uio[0]` pin. The program bytes should be loaded into the program memory starting at address 0:
+
+```python
+[1, 56, 119, 250, 44, 1, 54, 119, 250, 44, 3, 61]
+```
 
 ## External hardware
 
-SPI RAM for storing program code + data, can be simulated by an RP2040 (optional)
+None
