@@ -24,23 +24,25 @@ module tt_um_urish_spell (
   localparam StateSleep = 3'd5;
   localparam StateStop = 3'd6;
 
-  localparam REG_PC = 24'h000;
-  localparam REG_SP = 24'h004;
-  localparam REG_EXEC = 24'h008;
-  localparam REG_CTRL = 24'h00c;
-  localparam REG_CYCLES_PER_MS = 24'h010;
-  localparam REG_STACK_TOP = 24'h014;
-  localparam REG_STACK_PUSH = 24'h018;
-  localparam REG_INT_ENABLE = 24'h20;
-  localparam REG_INT = 24'h24;
+  localparam REG_PC = 2'd0;
+  localparam REG_SP = 2'd1;
+  localparam REG_EXEC = 2'd2;
+  localparam REG_STACK_TOP = 2'd3;
 
   wire o_sleep = state == StateSleep;
-  wire o_stop = state == StateStop;
-  wire o_spi_cs = 0;
-  wire o_spi_clk = 0;
-  wire o_spi_mosi = 0;
-  assign uo_out = {o_spi_mosi, o_spi_clk, o_spi_cs, 3'b0, o_stop, o_sleep};
+  wire o_stop = state == StateStop || state == StateSleep;
+  wire o_wait_delay = state == StateDelay;
+  reg o_shift_out;
+  assign uo_out = {4'b0, o_shift_out, o_wait_delay, o_stop, o_sleep};
 
+  wire i_run = ui_in[0];
+  wire i_step = ui_in[1];
+  wire i_load = ui_in[2];
+  wire i_dump = ui_in[3];
+  wire i_shift_in = ui_in[4];
+  wire [1:0] i_reg_sel = ui_in[6:5];
+
+  reg past_i_run;
   reg [2:0] state;
   reg [7:0] pc;
   reg [4:0] sp;
@@ -61,6 +63,9 @@ module tt_um_urish_spell (
   wire sleep;
   wire stop;
 
+  // shift register for loading data / dumping debug info
+  reg [7:0] shift_reg;
+
   // Out of order execution
   reg single_step;
   reg out_of_order_exec;
@@ -69,7 +74,6 @@ module tt_um_urish_spell (
   wire [7:0] stack_top = stack[stack_top_index];
 
   // Memory related registers
-  reg sram_enable;
   reg mem_select;
   reg mem_type_data;
   reg [7:0] mem_addr;
@@ -84,6 +88,7 @@ module tt_um_urish_spell (
   reg [7:0] delay_counter;
 
   // Debug stuff
+  reg [63:0] reg_name;
   reg [63:0] state_name;
 
   always @(*) begin
@@ -96,6 +101,15 @@ module tt_um_urish_spell (
       StateSleep: state_name <= "Sleep";
       StateStop: state_name <= "Stop";
       default: state_name <= "Invalid";
+    endcase
+  end
+
+  always @(*) begin
+    case (i_reg_sel)
+      REG_PC: reg_name <= "PC";
+      REG_SP: reg_name <= "SP";
+      REG_EXEC: reg_name <= "Exec";
+      REG_STACK_TOP: reg_name <= "StackTop";
     endcase
   end
 
@@ -124,7 +138,6 @@ module tt_um_urish_spell (
   spell_mem mem (
       .rst_n(rst_n),
       .clk(clk),
-      .sram_enable(sram_enable),
       .select(mem_select),
       .addr(mem_addr),
       .data_in(mem_write_value),
@@ -156,10 +169,48 @@ module tt_um_urish_spell (
       mem_write_en <= 0;
       single_step <= 0;
       out_of_order_exec <= 0;
-      sram_enable <= 0;
       cycles_per_ms <= 24'd10000;  /* we assume a 10MHz clock */
       delay_cycles <= 0;
+      shift_reg <= 0;
+      o_shift_out <= 0;
+      past_i_run <= 0;
     end else begin
+      shift_reg   <= {shift_reg[6:0], i_shift_in};
+      o_shift_out <= shift_reg[7];
+      past_i_run  <= i_run;
+
+      if (i_load) begin
+        case (i_reg_sel)
+          REG_PC: pc <= shift_reg;
+          REG_SP: sp <= shift_reg[4:0];
+          REG_EXEC: begin
+            opcode <= shift_reg;
+            state <= is_data_opcode(shift_reg) ? StateFetchData : StateExecute;
+            single_step <= 1;
+            out_of_order_exec <= 1;
+          end
+          REG_STACK_TOP: begin
+            stack[sp] <= shift_reg;
+            sp <= sp + 1;
+          end
+        endcase
+      end
+
+      if (i_dump) begin
+        case (i_reg_sel)
+          REG_PC: shift_reg <= pc;
+          REG_SP: shift_reg <= {3'b000, sp};
+          REG_EXEC: shift_reg <= opcode;
+          REG_STACK_TOP: shift_reg <= stack[sp-1];
+        endcase
+      end
+
+      if (i_run && !past_i_run && (state == StateSleep || state == StateStop)) begin
+        single_step <= i_step;
+        out_of_order_exec <= 0;
+        state <= StateFetch;
+      end
+
       case (state)
         StateFetch: begin
           // Read next instruction from code memory
@@ -223,7 +274,10 @@ module tt_um_urish_spell (
           end
         end
         StateSleep: begin
-          // The only way to leave this state is via CPU intervention.
+          // The only way to leave this state is via external intervention.
+        end
+        StateStop: begin
+          // The only way to leave this state is via external intervention.
         end
         StateDelay: begin
           if (delay_cycles + 1 >= cycles_per_ms) begin

@@ -5,7 +5,7 @@
 //
 `timescale 1ns / 1ps
 
-module spell_mem_dff (
+module spell_mem_internal (
     input wire rst_n,
     input wire clk,
     input wire select,
@@ -37,9 +37,9 @@ module spell_mem_dff (
       if (!select) begin
         data_out   <= 8'bx;
         data_ready <= 1'b0;
-`ifdef SPELL_DFF_DELAY
+`ifdef SPELL_INTERNAL_MEM_DELAY
         cycles <= 2'b11;
-`endif  /* SPELL_DFF_DELAY */
+`endif  /* SPELL_INTERNAL_MEM_DELAY */
       end else if (cycles > 0) begin
         cycles <= cycles - 1;
       end else begin

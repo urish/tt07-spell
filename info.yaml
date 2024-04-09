@@ -3,7 +3,7 @@ project:
   title:        "SPELL"      # Project title
   author:       "Uri Shaked"      # Your name
   discord:      "urish"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "SPELL is a minimal, stack-based programming language created for The Skull CTF"      # One line description of what your project does
+  description:  "SPELL is a minimal, cryptic, stack-based programming language crafted for The Skull CTF"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -18,30 +18,30 @@ project:
     - "spell.v"
     - "execute.v"
     - "mem.v"
-    - "mem_dff.v"
+    - "mem_internal.v"
     - "mem_io.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: "load"
-  ui[1]: "run"
-  ui[2]: "step"
-  ui[3]: "dbg0"
-  ui[4]: "dbg1"
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: "spi_miso"
+  ui[0]: "run"
+  ui[1]: "step"
+  ui[2]: "load"
+  ui[3]: "dump"
+  ui[4]: "shift_in"
+  ui[5]: "reg_sel[0]"
+  ui[6]: "segl_sel[1]"
+  ui[7]: ""
 
   # Outputs
   uo[0]: "sleep"
   uo[1]: "stop"
-  uo[2]: ""
-  uo[3]: ""
+  uo[2]: "wait_delay"
+  uo[3]: "shift_out"
   uo[4]: ""
-  uo[5]: "spi_cs"
-  uo[6]: "spi_clk"
-  uo[7]: "spi_mosi"
+  uo[5]: ""
+  uo[6]: ""
+  uo[7]: ""
 
   # Bidirectional pins
   uio[0]: "gpio[0]"
