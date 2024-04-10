@@ -58,7 +58,7 @@ The serial interface is implemented using a shift register, which is controlled 
 |-------------|--------|-------------------------------------------------------------------|
 | `reg_sel`   | input  | Select the register to read/write                                 |
 | `load`      | input  | Load the selected register with the value from the shift register |
-| `dump`      | output | Dump the selected register value to the shift register            |
+| `dump`      | input  | Dump the selected register value to the shift register            |
 | `shift_in`  | input  | Serial data input                                                 |
 | `shift_out` | output | Serial data output                                                |
 
