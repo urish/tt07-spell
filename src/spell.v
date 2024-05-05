@@ -31,7 +31,10 @@ module tt_um_urish_spell (
   wire o_stop = state == StateStop || state == StateSleep;
   wire o_wait_delay = state == StateDelay;
   reg o_shift_out;
-  assign uo_out = {4'b0, o_shift_out, o_wait_delay, o_stop, o_sleep};
+  wire o_cs;
+  wire o_clk;
+  wire o_mosi;
+  assign uo_out = {o_mosi, o_clk, o_cs, 1'b0, o_shift_out, o_wait_delay, o_stop, o_sleep};
 
   wire i_run = ui_in[0];
   wire i_step = ui_in[1];
@@ -39,6 +42,7 @@ module tt_um_urish_spell (
   wire i_dump = ui_in[3];
   wire i_shift_in = ui_in[4];
   wire [1:0] i_reg_sel = ui_in[6:5];
+  wire i_miso = ui_in[7];
 
   reg past_i_run;
   reg [2:0] state;
@@ -90,14 +94,7 @@ module tt_um_urish_spell (
   reg [63:0] state_name;
 
   // To avoid linter warnings about unused wires
-  wire _unused_ok = &{
-    1'b0,
-    ena,
-    ui_in[7],
-    state_name,
-    reg_name,
-    1'b0
-  };
+  wire _unused_ok = &{1'b0, ena, ui_in[7], state_name, reg_name, 1'b0};
 
   always @(*) begin
     case (state)
@@ -153,6 +150,11 @@ module tt_um_urish_spell (
       .write(mem_write_en),
       .data_out(mem_read_value),
       .data_ready(mem_data_ready),
+      // SPI mem
+      .spi_cs(o_cs),
+      .spi_clk(o_clk),
+      .spi_mosi(o_mosi),
+      .spi_miso(i_miso),
       // IO
       .io_in(uio_in),
       .io_out(uio_out),

@@ -1,6 +1,8 @@
 from typing import List, Union
 
 from cocotb.triggers import ClockCycles, RisingEdge
+from cocotbext.spi import SpiBus
+from sram_23lc512 import SRAM23LC512
 
 REG_PC = 0
 REG_SP = 1
@@ -9,7 +11,7 @@ REG_STACK_TOP = 3
 
 
 class SpellController:
-    def __init__(self, dut):
+    def __init__(self, dut, spi_mem=False):
         self._dut = dut
         self._dut.i_run.value = 0
         self._dut.i_step.value = 0
@@ -18,10 +20,16 @@ class SpellController:
         self._dut.i_shift_in.value = 0
         self._dut.i_reg_sel.value = 0
 
+        if spi_mem:
+            spi_bus = SpiBus.from_prefix(dut, "sram")
+            self.sram = SRAM23LC512(spi_bus)
+        else:
+            self.sram = None
+
     async def ensure_cpu_stopped(self):
         if self._dut.o_cpu_stop.value == 0:
             await RisingEdge(self._dut.o_cpu_stop)
-    
+
     def stopped(self):
         return self._dut.o_cpu_stop.value == 0
 

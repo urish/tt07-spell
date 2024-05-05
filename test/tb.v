@@ -18,7 +18,7 @@ module tb ();
   reg clk;
   reg rst_n;
   reg ena;
-  wire [7:0] ui_in = {1'b0, i_reg_sel, i_shift_in, i_dump, i_load, i_step, i_run};
+  wire [7:0] ui_in = {sram_miso, i_reg_sel, i_shift_in, i_dump, i_load, i_step, i_run};
   reg [7:0] uio_in;
   wire [7:0] uo_out;
   wire [7:0] uio_out;
@@ -35,6 +35,11 @@ module tb ();
   wire o_cpu_stop = uo_out[1];
   wire o_cpu_wait_delay = uo_out[2];
   wire o_shift_out = uo_out[3];
+
+  reg sram_miso;
+  wire sram_cs = uo_out[5];
+  wire sram_sclk = uo_out[6];
+  wire sram_mosi = uo_out[7];
 
   // Replace tt_um_example with your module name:
   tt_um_urish_spell user_project (

@@ -39,9 +39,10 @@ void spell() {
 
 This design is an hardware implementation of SPELL with the following features:
 
-- 32 bytes of program memory (volatile, simulates EEPROM)
+- 32 bytes of internal program memory (volatile, simulates EEPROM)
 - 32 bytes of stack memory
 - 8 bytes of internal RAM
+- External SPI memory interface (optional)
 
 To load a program or inspect the internal state, the design provides access to the following registers via a simple serial interface:
 
@@ -100,4 +101,6 @@ The following program which will rapidly blink an LED connected to the `uio[0]` 
 
 ## External hardware
 
-None
+You can connect an external 23LC512 SPI memory to the project. The MISO signal determines whether the design will use the external memory: pull it high (10k resistor to VDD) to use the external memory, or pull it low (10k resistor to GND) to use the internal memory.
+
+When using the external memory, the program will have access to 256 bytes of code memory, and 192 bytes of data memory (as the addresses 0x20 through 0x5f are mapped to the I/O registers).

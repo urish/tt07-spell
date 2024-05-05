@@ -1,2 +1,3 @@
 pytest==8.1.1
 cocotb==1.8.1
+cocotbext-spi==0.4.0

@@ -20,6 +20,7 @@ project:
     - "mem.v"
     - "mem_internal.v"
     - "mem_io.v"
+    - "mem_spi.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
@@ -31,7 +32,7 @@ pinout:
   ui[4]: "shift_in"
   ui[5]: "reg_sel[0]"
   ui[6]: "reg_sel[1]"
-  ui[7]: ""
+  ui[7]: "spi_miso"
 
   # Outputs
   uo[0]: "sleep"
@@ -39,9 +40,9 @@ pinout:
   uo[2]: "wait_delay"
   uo[3]: "shift_out"
   uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[5]: "spi_cs"
+  uo[6]: "spi_clk"
+  uo[7]: "spi_mosi"
 
   # Bidirectional pins
   uio[0]: "gpio[0]"

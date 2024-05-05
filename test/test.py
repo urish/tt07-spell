@@ -7,12 +7,12 @@ from cocotb.triggers import ClockCycles
 from spell_controller import SpellController
 
 
-async def reset(dut):
+async def reset(dut, spi_mem=False):
     dut._log.info("Reset")
     dut.ena.value = 1
-    dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
+    dut.sram_miso.value = 1 if spi_mem else 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
@@ -245,7 +245,7 @@ async def test_code_mem_init_0xff(dut):
 
     await spell.push(0)
     await spell.exec_opcode("?")
-    
+
     assert await spell.read_sp() == 1
     # 0xff is the default value of the code memory:
     assert await spell.read_stack_top() == 0xFF
@@ -339,3 +339,57 @@ async def test_intg_multiply(dut):
 
     assert await spell.read_sp() == 1
     assert await spell.read_stack_top() == 110
+
+
+@cocotb.test()
+async def test_spimem_add(dut):
+    """
+    SPI memory test: simple program that adds two numbers
+    """
+    spell = SpellController(dut, spi_mem=True)
+
+    # Write program
+    spell.sram.buffer[0] = 42
+    spell.sram.buffer[1] = 58
+    spell.sram.buffer[2] = ord("+")
+    spell.sram.buffer[3] = 0xFF
+
+    clock = Clock(dut.clk, 10, units="us")
+    cocotb.start_soon(clock.start())
+    await reset(dut, spi_mem=True)
+
+    await spell.execute()
+
+    assert await spell.read_sp() == 1
+    assert await spell.read_pc() == 4
+    assert await spell.read_stack_top() == 100
+
+
+@cocotb.test()
+async def test_code_spimem_read(dut):
+    spell = SpellController(dut, spi_mem=True)
+    clock = Clock(dut.clk, 10, units="us")
+    cocotb.start_soon(clock.start())
+    await reset(dut, spi_mem=True)
+
+    spell.sram.buffer[0x100] = 12  # First byte of the data memory
+
+    await spell.write_program([0x0, "r", "z"])
+    await spell.execute()
+
+    assert await spell.read_sp() == 1
+    assert await spell.read_stack_top() == 12
+
+
+@cocotb.test()
+async def test_code_spimem_write(dut):
+    spell = SpellController(dut, spi_mem=True)
+    clock = Clock(dut.clk, 10, units="us")
+    cocotb.start_soon(clock.start())
+    await reset(dut, spi_mem=True)
+
+    await spell.write_program([12, 0xFE, "!", 24, 0xEE, "w", "z"])
+    await spell.execute()
+
+    assert spell.sram.buffer[0xFE] == 12
+    assert spell.sram.buffer[0x1EE] == 24
