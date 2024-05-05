@@ -2,10 +2,10 @@
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
 [*] Tue Apr  9 10:35:16 2024
 [*]
-[dumpfile] "/home/uri/p/tt06-spell/test/tb.vcd"
+[dumpfile] "/home/uri/p/tt07-spell/test/tb.vcd"
 [dumpfile_mtime] "Tue Apr  9 10:34:47 2024"
 [dumpfile_size] 15291
-[savefile] "/home/uri/p/tt06-spell/test/tb.gtkw"
+[savefile] "/home/uri/p/tt07-spell/test/tb.gtkw"
 [timestart] 145200000
 [size] 1908 999
 [pos] -1 -1
