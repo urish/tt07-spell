@@ -31,7 +31,9 @@ module tt_um_urish_spell (
   wire o_stop = state == StateStop || state == StateSleep;
   wire o_wait_delay = state == StateDelay;
   reg o_shift_out;
-  assign uo_out = {4'b0, o_shift_out, o_wait_delay, o_stop, o_sleep};
+
+  reg [7:0] porta_out;
+  assign uo_out = {porta_out[7:4], o_shift_out, o_wait_delay, o_stop, o_sleep};
 
   wire i_run = ui_in[0];
   wire i_step = ui_in[1];
@@ -154,9 +156,10 @@ module tt_um_urish_spell (
       .data_out(mem_read_value),
       .data_ready(mem_data_ready),
       // IO
-      .io_in(uio_in),
-      .io_out(uio_out),
-      .io_oe(uio_oe)
+      .porta_out(porta_out),
+      .portb_in(uio_in),
+      .portb_out(uio_out),
+      .portb_oe(uio_oe)
   );
 
   function is_data_opcode(input [7:0] opcode_to_test);

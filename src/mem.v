@@ -15,9 +15,10 @@ module spell_mem (
     output wire data_ready,
 
     /* IO */
-    input  wire [7:0] io_in,
-    output wire [7:0] io_out,
-    output wire [7:0] io_oe  // out enable bar (low active)
+    output wire [7:0] porta_out,
+    input  wire [7:0] portb_in,
+    output wire [7:0] portb_out,
+    output wire [7:0] portb_oe  // out enable bar (low active)
 );
 
   wire code_select = select && !memory_type_data;
@@ -46,9 +47,10 @@ module spell_mem (
       .data_ready(io_data_ready),
 
       /* IO */
-      .io_in (io_in),
-      .io_out(io_out),
-      .io_oe(io_oe)
+      .porta_out(porta_out),
+      .portb_in (portb_in),
+      .portb_out(portb_out),
+      .portb_oe(portb_oe)
   );
 
   spell_mem_internal mem_internal (

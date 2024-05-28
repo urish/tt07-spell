@@ -39,20 +39,20 @@ pinout:
   uo[1]: "stop"
   uo[2]: "wait_delay"
   uo[3]: "shift_out"
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[4]: "porta[4]"
+  uo[5]: "porta[5]"
+  uo[6]: "porta[6]"
+  uo[7]: "porta[7]"
 
   # Bidirectional pins
-  uio[0]: "gpio[0]"
-  uio[1]: "gpio[1]"
-  uio[2]: "gpio[2]"
-  uio[3]: "gpio[3]"
-  uio[4]: "gpio[4]"
-  uio[5]: "gpio[5]"
-  uio[6]: "gpio[6]"
-  uio[7]: "gpio[7]"
+  uio[0]: "portb[0]"
+  uio[1]: "portb[1]"
+  uio[2]: "portb[2]"
+  uio[3]: "portb[3]"
+  uio[4]: "portb[4]"
+  uio[5]: "portb[5]"
+  uio[6]: "portb[6]"
+  uio[7]: "portb[7]"
 
 # Do not change!
 yaml_version: 6

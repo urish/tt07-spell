@@ -42,6 +42,7 @@ This design is an hardware implementation of SPELL with the following features:
 - 256 bytes of program memory (volatile, simulates EEPROM)
 - 32 bytes of stack memory
 - 32 bytes of data memory
+- 8 bidirectional pins and 4 output-only pins
 
 Initially, all the program memory is filled with `0xFF`, and the stack and data memory are filled with `0x00`.
 The program counter is set to `0x00`, and the stack pointer is set to `0x00`.
@@ -67,7 +68,7 @@ The serial interface is implemented using a shift register, which is controlled 
 
 When `load` is high, the value from the shift register is loaded into the selected register. When `dump` is high, the value of the selected register is dumped into the shift register, and can be read after two clock cycles by reading `shift_out` (MSB first).
 
-For example, if you want to read the value of the program counter, you would:
+For example, if you want to read the value of the program counter (PC), you would:
 
 1. Set `reg_sel` to 0x00 and set `dump` to 1
 3. Wait for two clock cycles for the first bit (MSB) to appear on `shift_out`.
@@ -96,13 +97,14 @@ Other addresses are reserved for future use, and should not be accessed.
 
 The following registers are available in the data memory space:
 
-| Address | Name | Description                                                           |
-|---------|------|-----------------------------------------------------------------------|
-| 0x36    | PIN  | Read the value of the `uio` pins, or toggle the value when written to |
-| 0x37    | DDR  | Set the direction of the `uio` pins (input or output)                 |
-| 0x38    | PORT | Write to the `uio` pins                                               |
+| Address | Name  | Description                                                             |
+|---------|-------|-------------------------------------------------------------------------|
+| 0x36    | PINB  | Read the value of the `portb` pins, or toggle the value when written to |
+| 0x37    | DDRB  | Set the direction of the `portb` pins (0 = input, 1 = output)           |
+| 0x38    | PORTB | Write to the `portb` pins                                               |
+| 0x3B    | PORTA | Write to the `porta` (output only) pins                                 |
 
-For example, to toggle the value of the `uio[2]` pin, you would write `0x04` to the `PIN` register.
+For example, to toggle the value of the `portb[2]` (`uio[2]`) pin, you would write `0x04` to the `PINB` register.
 
 ## How to test
 
