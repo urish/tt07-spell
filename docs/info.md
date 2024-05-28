@@ -119,7 +119,7 @@ After loading the program, you can execute it by writing the address of the firs
 The following program which will rapidly blink an LED connected to the `uio[0]` pin. The program bytes should be loaded into the program memory starting at address 0:
 
 ```python
-[1, 56, 119, 250, 44, 1, 54, 119, 250, 44, 3, 61]
+[1, 55, 119, 250, 44, 1, 54, 119, 250, 44, 3, 61]
 ```
 
 ## External hardware
