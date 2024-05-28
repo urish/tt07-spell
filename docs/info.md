@@ -131,12 +131,20 @@ To test SPELL, you need to load a program into the program memory and execute it
 
 After loading the program, you can execute it by writing the address of the first byte in the program memory to the `PC` register, and then pulsing the `run` signal.
 
-### Test program
+### Test programs
 
-The following program which will rapidly blink an LED connected to the `uio[0]` pin. The program bytes should be loaded into the program memory starting at address 0:
+The following program will spell "SPELL" on the Tiny Tapeout demo board's 7-segment display: (see what we did there?)
 
 ```python
-[1, 55, 119, 250, 44, 1, 54, 119, 250, 44, 3, 61]
+[127, 58, 119, 0, 129, 57, 57, 244, 62, 116, 109, 50, 0, 38, 94, 59, 119, 250, 44, 0, 59, 119, 25, 44, 11, 64, 3, 61]
+```
+
+The program bytes should be loaded into the program memory starting at address 0.
+
+And of course, the obligatory blink, rapidly blinking an LED connected to the `uio[0]` pin:
+
+```python
+[1, 55, 119, 1, 54, 119, 250, 44, 3, 61]
 ```
 
 ## External hardware
