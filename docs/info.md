@@ -39,9 +39,12 @@ void spell() {
 
 This design is an hardware implementation of SPELL with the following features:
 
-- 32 bytes of program memory (volatile, simulates EEPROM)
+- 256 bytes of program memory (volatile, simulates EEPROM)
 - 32 bytes of stack memory
-- 8 bytes of internal RAM
+- 32 bytes of data memory
+
+Initially, all the program memory is filled with `0xFF`, and the stack and data memory are filled with `0x00`.
+The program counter is set to `0x00`, and the stack pointer is set to `0x00`.
 
 To load a program or inspect the internal state, the design provides access to the following registers via a simple serial interface:
 
@@ -79,6 +82,27 @@ To write a value to the program counter, you would:
 Writing an opcode to the `EXEC` register will execute the opcode in place, without modifying the program counter (unless the opcode is a jump instruction).
 
 The `STACK` register is used to push a value onto the stack or read the top value from the stack (for debugging purposes).
+
+### Data memory and registers
+
+The data memory space is divided into two regions:
+
+| Address range | Description                                |
+|---------------|--------------------------------------------|
+| 0x00 - 0x1F   | General-purpose data storage (data memory) |
+| 0x20 - 0x5F   | I/O and control registers                  |
+
+Other addresses are reserved for future use, and should not be accessed.
+
+The following registers are available in the data memory space:
+
+| Address | Name | Description                                                           |
+|---------|------|-----------------------------------------------------------------------|
+| 0x36    | PIN  | Read the value of the `uio` pins, or toggle the value when written to |
+| 0x37    | DDR  | Set the direction of the `uio` pins (input or output)                 |
+| 0x38    | PORT | Write to the `uio` pins                                               |
+
+For example, to toggle the value of the `uio[2]` pin, you would write `0x04` to the `PIN` register.
 
 ## How to test
 

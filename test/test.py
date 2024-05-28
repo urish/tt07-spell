@@ -5,6 +5,7 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 from spell_controller import SpellController
+import random
 
 
 async def reset(dut):
@@ -245,10 +246,41 @@ async def test_code_mem_init_0xff(dut):
 
     await spell.push(0)
     await spell.exec_opcode("?")
-    
+
     assert await spell.read_sp() == 1
     # 0xff is the default value of the code memory:
     assert await spell.read_stack_top() == 0xFF
+
+
+@cocotb.test()
+async def test_code_mem_all_bytes(dut):
+    spell = SpellController(dut)
+    clock = Clock(dut.clk, 10, units="us")
+    cocotb.start_soon(clock.start())
+    await reset(dut)
+
+    # Check that all bytes of the code memory are initialized to 0xff
+    for i in range(256):
+        await spell.set_sp(0)
+        await spell.push(i)
+        await spell.exec_opcode("?")
+        assert await spell.read_stack_top() == 0xFF
+
+    seed = 1337  # for reproducibility
+    rng = random.Random(seed)
+    addresses = rng.sample(range(256), 256)
+    values = rng.sample(range(256), 256)
+
+    # Write a set of values to the code memory
+    for address, value in zip(addresses, values):
+        await spell.write_progmem(address, value)
+
+    # Check that the values were written correctly
+    for address, value in zip(addresses, values):
+        await spell.set_sp(0)
+        await spell.push(address)
+        await spell.exec_opcode("?")
+        assert await spell.read_stack_top() == value
 
 
 @cocotb.test()
