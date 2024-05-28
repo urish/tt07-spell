@@ -32,8 +32,12 @@ module tt_um_urish_spell (
   wire o_wait_delay = state == StateDelay;
   reg o_shift_out;
 
-  reg [7:0] porta_out;
-  assign uo_out = {porta_out[7:4], o_shift_out, o_wait_delay, o_stop, o_sleep};
+  wire [7:0] porta_oe;
+  wire [7:0] porta_out;
+  assign uo_out = (
+    (~porta_oe & {4'b0000, o_shift_out, o_wait_delay, o_stop, o_sleep})
+    | (porta_oe & porta_out)
+  );
 
   wire i_run = ui_in[0];
   wire i_step = ui_in[1];
@@ -92,14 +96,7 @@ module tt_um_urish_spell (
   reg [63:0] state_name;
 
   // To avoid linter warnings about unused wires
-  wire _unused_ok = &{
-    1'b0,
-    ena,
-    ui_in[7],
-    state_name,
-    reg_name,
-    1'b0
-  };
+  wire _unused_ok = &{1'b0, ena, ui_in[7], state_name, reg_name, 1'b0};
 
   always @(*) begin
     case (state)
@@ -157,6 +154,7 @@ module tt_um_urish_spell (
       .data_ready(mem_data_ready),
       // IO
       .porta_out(porta_out),
+      .porta_oe(porta_oe),
       .portb_in(uio_in),
       .portb_out(uio_out),
       .portb_oe(uio_oe)

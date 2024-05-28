@@ -42,7 +42,7 @@ This design is an hardware implementation of SPELL with the following features:
 - 256 bytes of program memory (volatile, simulates EEPROM)
 - 32 bytes of stack memory
 - 32 bytes of data memory
-- 8 bidirectional pins and 4 output-only pins
+- 8 bidirectional pins and up to 8 output-only pins
 
 Initially, all the program memory is filled with `0xFF`, and the stack and data memory are filled with `0x00`.
 The program counter is set to `0x00`, and the stack pointer is set to `0x00`.
@@ -64,7 +64,7 @@ The serial interface is implemented using a shift register, which is controlled 
 | `load`      | input  | Load the selected register with the value from the shift register |
 | `dump`      | input  | Dump the selected register value to the shift register            |
 | `shift_in`  | input  | Serial data input                                                 |
-| `shift_out` | output | Serial data output                                                |
+| `shift_out` | output | Serial data output (when `porta[3]` is disabled)                  |
 
 When `load` is high, the value from the shift register is loaded into the selected register. When `dump` is high, the value of the selected register is dumped into the shift register, and can be read after two clock cycles by reading `shift_out` (MSB first).
 
@@ -97,14 +97,29 @@ Other addresses are reserved for future use, and should not be accessed.
 
 The following registers are available in the data memory space:
 
-| Address | Name  | Description                                                             |
-|---------|-------|-------------------------------------------------------------------------|
-| 0x36    | PINB  | Read the value of the `portb` pins, or toggle the value when written to |
-| 0x37    | DDRB  | Set the direction of the `portb` pins (0 = input, 1 = output)           |
-| 0x38    | PORTB | Write to the `portb` pins                                               |
-| 0x3B    | PORTA | Write to the `porta` (output only) pins                                 |
+| Address | Name  | Description                                                              |
+|---------|-------|--------------------------------------------------------------------------|
+| 0x36    | PINB  | Read the value of the `portb` pins, or toggle the output when written to |
+| 0x37    | DDRB  | Set the direction of the `portb` pins (0 = input, 1 = output)            |
+| 0x38    | PORTB | Write to the `portb` pins                                                |
+| 0x39    | PINA  | Toggle the output on `porta` pins (write only; read returns 0x00)        |
+| 0x3A    | DDRA  | Enables of the `porta` pins (0 = disabled, 1 = output)                   |
+| 0x3B    | PORTA | Write to the `porta` (output only) pins                                  |
 
 For example, to toggle the value of the `portb[2]` (`uio[2]`) pin, you would write `0x04` to the `PINB` register.
+
+The `porta[3:0]` pins are also used for debug output, and their function is determined by the `DDRA` register:
+
+| Output pin | DDRA[n] == 0 | DDRA[n] == 1 |
+|------------|--------------|--------------|
+| 0          | `sleep`      | `porta[0]`   |
+| 1          | `stop`       | `porta[1]`   |
+| 2          | `wait_delay` | `porta[2]`   |
+| 3          | `shift_out`  | `porta[3]`   |
+| 4          | 0            | `porta[4]`   |
+| 5          | 0            | `porta[5]`   |
+| 6          | 0            | `porta[6]`   |
+| 7          | 0            | `porta[7]`   |
 
 ## How to test
 

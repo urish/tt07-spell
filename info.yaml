@@ -35,10 +35,10 @@ pinout:
   ui[7]: ""
 
   # Outputs
-  uo[0]: "sleep"
-  uo[1]: "stop"
-  uo[2]: "wait_delay"
-  uo[3]: "shift_out"
+  uo[0]: "sleep/porta[0]"
+  uo[1]: "stop/porta[1]"
+  uo[2]: "wait_delay/porta[2]"
+  uo[3]: "shift_out/porta[3]"
   uo[4]: "porta[4]"
   uo[5]: "porta[5]"
   uo[6]: "porta[6]"

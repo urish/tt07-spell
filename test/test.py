@@ -299,10 +299,9 @@ async def test_data_mem(dut):
 
 
 @cocotb.test()
-async def test_io(dut):
-    PINB = 0x36
-    DDRB = 0x37
-    PORTB = 0x38
+async def test_porta(dut):
+    PINA = 0x39
+    DDRA = 0x3A
     PORTA = 0x3B
 
     spell = SpellController(dut)
@@ -310,11 +309,38 @@ async def test_io(dut):
     cocotb.start_soon(clock.start())
     await reset(dut)
 
-    assert dut.uo_out.value & 0xc0 == 0x00
-    await spell.push(0xc0)
+    assert dut.uo_out.value & 0xF0 == 0x00
+    await spell.push(0xC6)
     await spell.push(PORTA)
     await spell.exec_opcode("w")
-    assert dut.uo_out.value & 0xc0 == 0xc0
+    assert dut.uo_out.value & 0xF0 == 0x00
+
+    await spell.push(0xFF)
+    await spell.push(DDRA)
+    await spell.exec_opcode("w")
+    assert dut.uo_out.value == 0xC6
+
+    await spell.push(0xF0)
+    await spell.push(DDRA)
+    await spell.exec_opcode("w")
+    assert dut.uo_out.value & 0xF0 == 0xC0
+
+    await spell.push(0x80)
+    await spell.push(PINA)
+    await spell.exec_opcode("w")
+    assert dut.uo_out.value & 0xF0 == 0x40
+
+
+@cocotb.test()
+async def test_portb(dut):
+    PINB = 0x36
+    DDRB = 0x37
+    PORTB = 0x38
+
+    spell = SpellController(dut)
+    clock = Clock(dut.clk, 10, units="us")
+    cocotb.start_soon(clock.start())
+    await reset(dut)
 
     await spell.push(0xF0)
     await spell.push(DDRB)
@@ -336,6 +362,7 @@ async def test_io(dut):
     await spell.exec_opcode("r")
     assert await spell.read_sp() == 1
     assert await spell.read_stack_top() == 0x7A
+
 
 @cocotb.test()
 async def test_io_pin_reg(dut):
