@@ -32,12 +32,18 @@ def power(reader, macro_x_pos: list[int]):
     for x_pos in macro_x_pos:
         for i in range(3):
             x = int(x_pos * 1000) + 18280 + i * 153600
-            odb.dbSBox_create(vpwr_wire, met4, x, 11880, x + 1600, 144120, "STRIPE")
-            odb.dbBox_create(vpwr_bpin, met4, x, 11880, x + 1600, 144120)
+            odb.dbSBox_create(vpwr_wire, met4, x, 7880, x + 1600, 223280, "STRIPE")
+            odb.dbBox_create(vpwr_bpin, met4, x, 7880, x + 1600, 223280)
         for i in range(2):
             x = int(x_pos * 1000) + 95080 + i * 153600
-            odb.dbSBox_create(vgnd_wire, met4, x, 11880, x + 1600, 144120, "STRIPE")
-            odb.dbBox_create(vgnd_bpin, met4, x, 11880, x + 1600, 144120)
+            odb.dbSBox_create(vgnd_wire, met4, x, 7880, x + 1600, 223280, "STRIPE")
+            odb.dbBox_create(vgnd_bpin, met4, x, 7880, x + 1600, 223280)
+
+    # PDN adds two shorter VPWR/VGND stripes on the right side, so extend them to full height in order to pass precheck
+    odb.dbSBox_create(vpwr_wire, met4, 1357580, 2480, 1359180, 223280, "STRIPE")
+    odb.dbBox_create(vpwr_bpin, met4, 1357580, 2480, 1359180, 223280)
+    odb.dbSBox_create(vgnd_wire, met4, 1360340, 2480, 1361940, 223280, "STRIPE")
+    odb.dbBox_create(vgnd_bpin, met4, 1360340, 2480, 1361940, 223280)
 
 
 if __name__ == "__main__":
