@@ -1,0 +1,34 @@
+; Spell "SPELL" on the Tiny Tapeout demo board's 7-segment display
+; Compile with hlspl: https://github.com/urish/hlspl
+; Author: Uri Shaked
+; License: Public Domain
+
+.ORIGIN 0
+
+CONST PINA 0x39
+CONST DDRA 0x3A
+CONST PORTA 0x3B
+
+; Configure the first 7 uo_out pins as outputs
+  PUSH 127
+  PUSH DDRA
+  WRITE
+:Start
+  PUSH 0        ; null terminator
+  PUSH 129      ; ' '
+  PUSH 57       ; L
+  PUSH 57       ; L
+  PUSH 244      ; E (actually 122, hence we SHR next)
+  SHR
+  PUSH 116      ; P
+  PUSH 109      ; S
+:Wait
+  PUSH PORTA
+  WRITE 
+  DELAY 250
+  PUSH 0
+  PUSH PORTA
+  WRITE
+  DELAY 25
+  LOOP @Wait
+  JMP @Start
